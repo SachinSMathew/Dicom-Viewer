@@ -37,31 +37,31 @@ class OpenUrl extends PureComponent {
         this.props.onClose(true, this.urlField.current.value)
     }
 
-    render() {
-        return (
-            <div className="md-grid">
-                <Toolbar
-                    fixed
-                    nav={<Button icon onClick={() => this.props.onClose(false)}>close</Button>}
-                    title={'Open URL'}
-                />
-                <div style={styleUrl}>
-                    <TextField 
-                        fullWidth 
-                        id="idUrl" 
-                        ref={this.urlField} 
-                        placeholder="URL" 
-                        style={styleText} 
-                        value='' />
-                    <Button 
-                        icon
-                        style={styleButton} 
-                        onClick={this.onClick}>get_app</Button>
-                </div>
+//     render() {
+//         return (
+//             <div className="md-grid">
+//                 <Toolbar
+//                     fixed
+//                     nav={<Button icon onClick={() => this.props.onClose(false)}>close</Button>}
+//                     title={'Open URL'}
+//                 />
+//                 <div style={styleUrl}>
+//                     <TextField 
+//                         fullWidth 
+//                         id="idUrl" 
+//                         ref={this.urlField} 
+//                         placeholder="URL" 
+//                         style={styleText} 
+//                         value='' />
+//                     <Button 
+//                         icon
+//                         style={styleButton} 
+//                         onClick={this.onClick}>get_app</Button>
+//                 </div>
 
-            </div>
-        )
-    }
-}
+//             </div>
+//         )
+//     }
+// }
 
 export default OpenUrl

@@ -30,8 +30,10 @@ getRGBPixelsImage(image, x, y, width, height) {
 
 export function getPixel(element, image, isDcm, x, y) {
     let sp = []
+    console.log("Inside")
     if (isDcm) {
         if (image.color) {
+            console.log(image.color)
             sp = getRGBPixels(element, x, y, 1, 1)
         } else {
             sp = cornerstone.getStoredPixels(element, x, y, 1, 1)

@@ -43,6 +43,7 @@ import Typography from '@material-ui/core/Typography'
 import 'react-perfect-scrollbar/dist/css/styles.css'
 import PerfectScrollbar from 'react-perfect-scrollbar'
 
+
 import { 
   isMobile, 
   isTablet,
@@ -2100,7 +2101,8 @@ class App extends PureComponent {
                         <Typography type="body1" style={{fontSize: '0.80em', marginLeft: '-23px'}}>No Tool</Typography>
                       }
                     />
-                  </ListItem>     
+                  </ListItem>  
+                  {/*   
                   <ListItem button style={{paddingLeft: 30}} onClick={() => this.toolExecute('referencelines')} disabled={!isOpen}>
                     <ListItemIcon><Icon path={mdiArrowSplitHorizontal} size={iconSizeSmall} color={visibleReferenceLines ? activeColor : iconColor} /></ListItemIcon>
                     <ListItemText classes={primaryClass}
@@ -2108,6 +2110,7 @@ class App extends PureComponent {
                         <Typography type="body1" style={{fontSize: '0.80em', marginLeft: '-23px'}}>Reference Lines</Typography>
                       }
                     />
+                    
                   </ListItem>        
                   <ListItem button style={{paddingLeft: 30}} onClick={() => this.toolExecute('serieslink')} disabled={!isOpen}>
                     <ListItemIcon><Icon path={mdiVectorLink} size={iconSizeSmall} color={visibleSeriesLink ? activeColor : iconColor} /></ListItemIcon>
@@ -2115,8 +2118,11 @@ class App extends PureComponent {
                       primary={
                         <Typography type="body1" style={{fontSize: '0.80em', marginLeft: '-23px'}}>Link Series</Typography>
                       }
+                    
                     />
-                  </ListItem>                               
+                    
+                  </ListItem> 
+                    */}                              
                   <ListItem button style={{paddingLeft: 30}} onClick={() => this.toolExecute('Wwwc')} disabled={!isOpen}>
                     <ListItemIcon><Icon path={mdiArrowAll} size={iconSize} color={this.colorIcon('Wwwc')} /></ListItemIcon>
                     <ListItemText classes={primaryClass}
@@ -2365,7 +2371,7 @@ class App extends PureComponent {
         <Dialog
             open={this.state.visibleOpenUrl}
         >
-            <DialogTitle>{"Open URL"}</DialogTitle>
+            {/* <DialogTitle>{"Open URL"}</DialogTitle>
               <DialogContent>
                 <DialogContentText>
                   Insert an URL to download a DICOM or image file:
@@ -2385,7 +2391,7 @@ class App extends PureComponent {
                 <Button onClick={() => this.hideOpenUrl(true)} autoFocus>
                     Ok
                 </Button>
-            </DialogActions>
+            </DialogActions> */}
         </Dialog>
 
         <Dialog

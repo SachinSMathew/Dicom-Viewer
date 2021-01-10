@@ -28,7 +28,7 @@ const DicomHeader = ({dcmViewer, classes, color}) => {
 
     header.push({name: 'MR Acquisition Type', value: dcmViewer.image.data.string('x00180023')})
     header.push({name: 'Slice Thickness', value: dcmViewer.image.data.string('x00180050')})
-    header.push({name: 'Spacing Between Slice', value: dcmViewer.image.data.string('x00180088')})
+    //header.push({name: 'Spacing Between Slice', value: dcmViewer.image.data.string('x00180088')})
     header.push({name: 'Patient Position', value: dcmViewer.image.data.string('x00185100')})
 
     header.push({name: 'Study ID', value: dcmViewer.image.data.string('x00200010')})
