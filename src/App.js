@@ -1824,7 +1824,7 @@ class App extends PureComponent {
     const visibleToolsPanel = Boolean(this.state.anchorElToolsPanel)
     const mprMenu = this.state.mprMenu && this.mprPlane !== '' //  && isMultipleFiles
 
-    //let iconToolColor = this.state.toolState === 1 ? '#FFFFFF' : '#999999'
+    let iconToolColor = this.state.toolState === 1 ? '#FFFFFF' : '#999999'
 
     const dcmViewer = this.getActiveDcmViewer()
 
@@ -1838,7 +1838,7 @@ class App extends PureComponent {
     return (
       <div>
         <AppBar className={classes.appBar} position='static' elevation={0}>
-          <Toolbar variant="dense">
+          <Toolbar variant="dense ">
             <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu" onClick={this.toggleMainMenu}>
               <MenuIcon />
             </IconButton>
@@ -1872,23 +1872,23 @@ class App extends PureComponent {
             { isOpen ? (
               <Tooltip title="Reset Image">
                 <IconButton onClick={this.resetImage}>
-                  <Icon path={mdiRefresh} size={iconSize} color={iconColor} />
+                  <Icon path={mdiRefresh} size={iconSize} color={iconToolColor} />
                 </IconButton>
               </Tooltip>
              ) : null
             }            
-            { isOpen ? (
+            {/* { isOpen ? (
               <Tooltip title="Tools">
                 <IconButton onClick={this.handleToolsPanel}>
                   <Icon path={mdiTools} size={iconSize} color={iconColor} />
                 </IconButton>
               </Tooltip>
              ) : null
-            }            
+            }             */}
             { isOpen ? (
               <Tooltip title="Save Screenshot">
                 <IconButton color="inherit" onClick={this.saveShot}>
-                  <Icon path={mdiCamera} size={iconSize} color={iconColor} />
+                  <Icon path={mdiCamera} size={iconSize} color={iconToolColor} />
                 </IconButton>
               </Tooltip>
              ) : null
@@ -1904,7 +1904,7 @@ class App extends PureComponent {
             { isOpen ? (
               <Tooltip title="Measurements">
                 <IconButton color="inherit" onClick={this.toggleMeasure}>
-                  <Icon path={mdiFileCad} size={iconSize} color={iconColor} />
+                  <Icon path={mdiFileCad} size={iconSize} color={iconToolColor} />
                 </IconButton>
               </Tooltip>
               ) : null
@@ -1912,7 +1912,7 @@ class App extends PureComponent {
             { isOpen && dcmViewer.isDicom ? (
               <Tooltip title="Dicom Header">
                 <IconButton color="inherit" onClick={this.toggleHeader}>
-                  <Icon path={mdiFileDocument} size={iconSize} color={iconColor} />
+                  <Icon path={mdiFileDocument} size={iconSize} color={iconToolColor} />
                 </IconButton>
               </Tooltip>
               ) : null
@@ -1920,7 +1920,7 @@ class App extends PureComponent {
             { isDicomdir ? (
               <Tooltip title="DICOMDIR">
                 <IconButton color="inherit" onClick={this.toggleDicomdir}>
-                  <Icon path={mdiFolderOpen} size={iconSize} color={iconColor} />
+                  <Icon path={mdiFolderOpen} size={iconSize} color={iconToolColor} />
                 </IconButton>
               </Tooltip>
               ) : null
@@ -1928,7 +1928,7 @@ class App extends PureComponent {
             { (isOpen && this.isMultipleFiles) || visibleMprOrthogonal ? (
               <Tooltip title="Explorer">
                 <IconButton color="inherit" onClick={this.toggleExplorer}>
-                  <Icon path={mdiAnimationOutline} size={iconSize} color={iconColor} />
+                  <Icon path={mdiAnimationOutline} size={iconSize} color={iconToolColor} />
                 </IconButton>
               </Tooltip>
               ) : null
@@ -1936,7 +1936,7 @@ class App extends PureComponent {
             { isOpen ? (
               <Tooltip title="Sandbox File Manager">
                 <IconButton color="inherit" onClick={this.toggleFileManager}>
-                  <Icon path={mdiFileCabinet} size={iconSize} color={iconColor} />
+                  <Icon path={mdiFileCabinet} size={iconSize} color={iconToolColor} />
                 </IconButton>
               </Tooltip>
               ) : null
@@ -1976,13 +1976,13 @@ class App extends PureComponent {
                         <Typography type="body1" style={{fontSize: '0.80em', marginLeft: '-20px'}}>File</Typography>
                       } />
                   </ListItem>
-                  <ListItem button style={{paddingLeft: 30}} onClick={() => this.showOpenUrl()}>
+                  {/* <ListItem button style={{paddingLeft: 30}} onClick={() => this.showOpenUrl()}>
                     <ListItemIcon><Icon path={mdiWeb} size={'1.0rem'} color={iconColor} /></ListItemIcon>
                     <ListItemText classes={primaryClass} 
                       primary={
                         <Typography type="body1" style={{fontSize: '0.80em', marginLeft: '-20px'}}>URL</Typography>
                       } />
-                  </ListItem>
+                  </ListItem> */}
                   { isInputDirSupported() && !isMobile?
                   <ListItem button style={{paddingLeft: 30}} onClick={() => this.showOpenFolder()}>
                     <ListItemIcon><Icon path={mdiFolderOpen} size={'1.0rem'} color={iconColor} /></ListItemIcon>
@@ -1992,7 +1992,7 @@ class App extends PureComponent {
                       } />
                   </ListItem>    
                   : null }                     
-                  { isInputDirSupported() && !isMobile?
+                  {/* { isInputDirSupported() && !isMobile?
                   <ListItem button style={{paddingLeft: 30}} onClick={() => this.showOpenDicomdir()}>
                     <ListItemIcon><Icon path={mdiFolderOpen} size={'1.0rem'} color={iconColor} /></ListItemIcon>
                     <ListItemText classes={primaryClass} 
@@ -2000,7 +2000,7 @@ class App extends PureComponent {
                         <Typography type="body1" style={{fontSize: '0.80em', marginLeft: '-20px'}}>DICOMDIR</Typography>
                       } />
                   </ListItem>    
-                  : null }                                          
+                  : null }                                           */}
                 </List>
               </Collapse>  
 
