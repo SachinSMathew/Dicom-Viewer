@@ -1123,491 +1123,491 @@ class App extends PureComponent {
   // ---------------------------------------------------------------------------------------------- MPR
   // #region MPR
 
-  mprBuildVolume = () => {
-    //console.log('mprBuildVolume: ', this.state.sliceIndex)
-    //console.log('this.files: ', this.files)
-    //console.log('this.dicomViewersRefs[0].files: ', this.dicomViewersRefs[0].files)
+//   mprBuildVolume = () => {
+//     //console.log('mprBuildVolume: ', this.state.sliceIndex)
+//     //console.log('this.files: ', this.files)
+//     //console.log('this.dicomViewersRefs[0].files: ', this.dicomViewersRefs[0].files)
 
-    // "For the specific case of dual-echo MR images select files with same EchoNumber tag of selected image.
-    // see https://groups.google.com/forum/#!topic/comp.protocols.dicom/zh2TzgbjvdE    
-    const echoNumber = getDicomEchoNumber(this.dicomViewersRefs[this.props.activeDcmIndex].image)
+//     // "For the specific case of dual-echo MR images select files with same EchoNumber tag of selected image.
+//     // see https://groups.google.com/forum/#!topic/comp.protocols.dicom/zh2TzgbjvdE    
+//     const echoNumber = getDicomEchoNumber(this.dicomViewersRefs[this.props.activeDcmIndex].image)
 
-    if (this.volume.length > 0 && echoNumber === this.echoNumber) return
+//     if (this.volume.length > 0 && echoNumber === this.echoNumber) return
 
-    this.t0 = performance.now()
+//     this.t0 = performance.now()
 
-    const files = this.dicomViewersRefs[0].files.filter((a) => {
-      return a.series.echoNumber === echoNumber}
-    )
-    if (files.length < this.files.length) { // until mprMode is true temporary works on files with same EchoNumber
-      this.echoNumber = echoNumber
-      this.dicomViewersRefs[this.props.activeDcmIndex].runTool('setfiles', files)
-    }
+//     const files = this.dicomViewersRefs[0].files.filter((a) => {
+//       return a.series.echoNumber === echoNumber}
+//     )
+//     if (files.length < this.files.length) { // until mprMode is true temporary works on files with same EchoNumber
+//       this.echoNumber = echoNumber
+//       this.dicomViewersRefs[this.props.activeDcmIndex].runTool('setfiles', files)
+//     }
 
-    const sliceIndex = this.state.sliceIndex
-    const xPixelSpacing = getDicomPixelSpacing(files[sliceIndex].image, 1)
-    const spacingBetweenSlice = getDicomSpacingBetweenSlice(files[sliceIndex].image)
-    const sliceThickness = getDicomSliceThickness(files[sliceIndex].image)
-    const length = files[sliceIndex].image.getPixelData().length
-    const sliceLocation = getDicomSliceLocation(files[sliceIndex].image)
+//     const sliceIndex = this.state.sliceIndex
+//     const xPixelSpacing = getDicomPixelSpacing(files[sliceIndex].image, 1)
+//     const spacingBetweenSlice = getDicomSpacingBetweenSlice(files[sliceIndex].image)
+//     const sliceThickness = getDicomSliceThickness(files[sliceIndex].image)
+//     const length = files[sliceIndex].image.getPixelData().length
+//     const sliceLocation = getDicomSliceLocation(files[sliceIndex].image)
 
-    this.volume = []
+//     this.volume = []
 
-    // see https://stackoverflow.com/questions/58412358/dicom-multiplanar-image-reconstruction
-    this.mprData.zDim = Math.round(files.length * spacingBetweenSlice / xPixelSpacing)
+//     // see https://stackoverflow.com/questions/58412358/dicom-multiplanar-image-reconstruction
+//     this.mprData.zDim = Math.round(files.length * spacingBetweenSlice / xPixelSpacing)
 
-    //console.log('this.mprData.zDim: ', this.mprData.zDim)
-    //console.log('spacingBetweenSlice: ', spacingBetweenSlice)
-    //console.log('sliceThickness: ', sliceThickness)
-    //console.log('xPixelSpacing: ', xPixelSpacing)
-    //console.log('getSliceLocation: ', sliceLocation)
+//     //console.log('this.mprData.zDim: ', this.mprData.zDim)
+//     //console.log('spacingBetweenSlice: ', spacingBetweenSlice)
+//     //console.log('sliceThickness: ', sliceThickness)
+//     //console.log('xPixelSpacing: ', xPixelSpacing)
+//     //console.log('getSliceLocation: ', sliceLocation)
 
-    // If spacing between slices is less than slice thickness, the images are not optimal for 3D reconstruction.
-    // Try an alternative algorithm based on slice distance.
-    let zDimMethod2 = false
-    if (spacingBetweenSlice < sliceThickness && sliceLocation === undefined) {
-      let max = files[sliceIndex].sliceDistance
-      let min = files[sliceIndex].sliceDistance
-      for(let i=0; i < files.length; i++) {
-        if (files[i].sliceDistance > max)
-          max = files[i].sliceDistance
-        if (files[i].sliceDistance < min)
-          min = files[i].sliceDistance  
-      }
-      this.mprData.zDim = Math.round(Math.abs(max - min) / xPixelSpacing)
-      //console.log('method2, this.mprData.zDim: ', this.mprData.zDim)
-      zDimMethod2 = true
-    }
-    //console.log('this.mprData.zDim: ', this.mprData.zDim)
-    this.mprData.zStep = Math.round(this.mprData.zDim / files.length)
-    //console.log('this.mprData.zStep: ', this.mprData.zStep)
+//     // If spacing between slices is less than slice thickness, the images are not optimal for 3D reconstruction.
+//     // Try an alternative algorithm based on slice distance.
+//     let zDimMethod2 = false
+//     if (spacingBetweenSlice < sliceThickness && sliceLocation === undefined) {
+//       let max = files[sliceIndex].sliceDistance
+//       let min = files[sliceIndex].sliceDistance
+//       for(let i=0; i < files.length; i++) {
+//         if (files[i].sliceDistance > max)
+//           max = files[i].sliceDistance
+//         if (files[i].sliceDistance < min)
+//           min = files[i].sliceDistance  
+//       }
+//       this.mprData.zDim = Math.round(Math.abs(max - min) / xPixelSpacing)
+//       //console.log('method2, this.mprData.zDim: ', this.mprData.zDim)
+//       zDimMethod2 = true
+//     }
+//     //console.log('this.mprData.zDim: ', this.mprData.zDim)
+//     this.mprData.zStep = Math.round(this.mprData.zDim / files.length)
+//     //console.log('this.mprData.zStep: ', this.mprData.zStep)
     
-    if (files.length === this.mprData.zDim) { // slices contiguous
-      for (let i = 0, len = files.length; i < len; i++) {
-        this.volume.push(files[i].image.getPixelData())
-      }
+//     if (files.length === this.mprData.zDim) { // slices contiguous
+//       for (let i = 0, len = files.length; i < len; i++) {
+//         this.volume.push(files[i].image.getPixelData())
+//       }
       
-    } else if (files.length < this.mprData.zDim) { // gap between slices
+//     } else if (files.length < this.mprData.zDim) { // gap between slices
       
-      let emptyPlane = new Int16Array(length).fill(0)
-      for (let i = 0, len = this.mprData.zDim; i < len; i++) {
-        this.volume.push(emptyPlane)
-      }
+//       let emptyPlane = new Int16Array(length).fill(0)
+//       for (let i = 0, len = this.mprData.zDim; i < len; i++) {
+//         this.volume.push(emptyPlane)
+//       }
 
-      let order = []
+//       let order = []
 
-      for (let i = 0; i < files.length; i++) {
-        order.push({iFile: i, instanceNumber: files[i].instanceNumber, sliceDistance: files[i].sliceDistance, sliceLocation: files[i].sliceLocation})
-      }
-      //console.log('order 1: ', order) 
+//       for (let i = 0; i < files.length; i++) {
+//         order.push({iFile: i, instanceNumber: files[i].instanceNumber, sliceDistance: files[i].sliceDistance, sliceLocation: files[i].sliceLocation})
+//       }
+//       //console.log('order 1: ', order) 
 
-      if (zDimMethod2) {
-        // eliminate eventually duplicates
-        order = order.reduce((previous, current) => {
-          let object = previous.filter(object => object.sliceDistance === current.sliceDistance)
-          if (object.length === 0) {
-            previous.push(current)
-          }
-          return previous
-        }, [])
+//       if (zDimMethod2) {
+//         // eliminate eventually duplicates
+//         order = order.reduce((previous, current) => {
+//           let object = previous.filter(object => object.sliceDistance === current.sliceDistance)
+//           if (object.length === 0) {
+//             previous.push(current)
+//           }
+//           return previous
+//         }, [])
 
-        order.sort((l, r) => {
-          // return r.sliceDistance - l.sliceDistance
-          return l.instanceNumber - r.instanceNumber
-        })     
-        //console.log('order - zDimMethod2: ', order)     
+//         order.sort((l, r) => {
+//           // return r.sliceDistance - l.sliceDistance
+//           return l.instanceNumber - r.instanceNumber
+//         })     
+//         //console.log('order - zDimMethod2: ', order)     
 
-      } else {
-        const reorder = (files[0].sliceDistance < files[1].sliceDistance)
-        //console.log('reorder 1: ', reorder)
-        // const reorder = files[sliceIndex].sliceLocation < files[1].sliceLocation
-        if (reorder) {
-          order.sort((l, r) => {
-            return r.sliceDistance - l.sliceDistance
-            //return r.sliceLocation - l.sliceLocation
-            // return r.instanceNumber - l.instanceNumber
-          })    
-          //console.log('order - no zDimMethod2, 1: ', order)
-        } else {
-          const isOnRows = getDicomImageXOnRows(files[sliceIndex].image)
-          const reorder = Math.sign(files[0].sliceDistance) * Math.sign(files[0].sliceLocation) < 0
-          //console.log('reorder 2: ', reorder)
-          if (reorder) {        
-            order.sort((l, r) => {
-              if (isOnRows)
-                return l.sliceDistance - r.sliceDistance
-              else
-                return r.sliceDistance - l.sliceDistance  
-            })    
-            //console.log('order - no zDimMethod2, 2: ', order)
-          }
-        }
-      }
-/*
-      order.sort((l, r) => {
-        return r.sliceDistance - l.sliceDistance
-        // return l.instanceNumber - r.instanceNumber
-      })  
-*/
-      //console.log('order 2: ', order)
+//       } else {
+//         const reorder = (files[0].sliceDistance < files[1].sliceDistance)
+//         //console.log('reorder 1: ', reorder)
+//         // const reorder = files[sliceIndex].sliceLocation < files[1].sliceLocation
+//         if (reorder) {
+//           order.sort((l, r) => {
+//             return r.sliceDistance - l.sliceDistance
+//             //return r.sliceLocation - l.sliceLocation
+//             // return r.instanceNumber - l.instanceNumber
+//           })    
+//           //console.log('order - no zDimMethod2, 1: ', order)
+//         } else {
+//           const isOnRows = getDicomImageXOnRows(files[sliceIndex].image)
+//           const reorder = Math.sign(files[0].sliceDistance) * Math.sign(files[0].sliceLocation) < 0
+//           //console.log('reorder 2: ', reorder)
+//           if (reorder) {        
+//             order.sort((l, r) => {
+//               if (isOnRows)
+//                 return l.sliceDistance - r.sliceDistance
+//               else
+//                 return r.sliceDistance - l.sliceDistance  
+//             })    
+//             //console.log('order - no zDimMethod2, 2: ', order)
+//           }
+//         }
+//       }
+// /*
+//       order.sort((l, r) => {
+//         return r.sliceDistance - l.sliceDistance
+//         // return l.instanceNumber - r.instanceNumber
+//       })  
+// */
+//       //console.log('order 2: ', order)
 
-      this.mprData.instanceNumberOrder = files[order[0].iFile].instanceNumber < files[order[1].iFile].instanceNumber ? 1 : -1
-      this.mprData.indexMax = files.length
+//       this.mprData.instanceNumberOrder = files[order[0].iFile].instanceNumber < files[order[1].iFile].instanceNumber ? 1 : -1
+//       this.mprData.indexMax = files.length
 
-      let intervals = [0]
-      this.volume[0] = files[order[0].iFile].image.getPixelData()
-      this.volume[this.mprData.zDim-1] = files[order[order.length-1].iFile].image.getPixelData()  
-      const step = (this.mprData.zDim-2) / (order.length-2)
-      let i = 0
-      for (let k = 1; k <= order.length-2; k++) {  
-          i = Math.ceil(i+step)
-          //console.log(`i: ${i},  k: ${k},  order[k].iFile: ${order[k].iFile}`)
-          this.volume[i] = files[order[k].iFile].image.getPixelData() // order[k-1].iFile
-          intervals.push(i)
-      }
-      intervals.push(this.mprData.zDim-1)
+//       let intervals = [0]
+//       this.volume[0] = files[order[0].iFile].image.getPixelData()
+//       this.volume[this.mprData.zDim-1] = files[order[order.length-1].iFile].image.getPixelData()  
+//       const step = (this.mprData.zDim-2) / (order.length-2)
+//       let i = 0
+//       for (let k = 1; k <= order.length-2; k++) {  
+//           i = Math.ceil(i+step)
+//           //console.log(`i: ${i},  k: ${k},  order[k].iFile: ${order[k].iFile}`)
+//           this.volume[i] = files[order[k].iFile].image.getPixelData() // order[k-1].iFile
+//           intervals.push(i)
+//       }
+//       intervals.push(this.mprData.zDim-1)
 
-      const interpolationMethod = getSettingsMprInterpolation()
+//       const interpolationMethod = getSettingsMprInterpolation()
 
-      if (interpolationMethod === 'no') {
-        // build missing planes without interpolation, simple duplicate
-        for (let i = 0; i < intervals.length-1; i++)
-          for (let j = intervals[i]+1; j <= intervals[i+1]-1; j++)
-            this.volume[j] = this.volume[intervals[i+1]]
-      } else if (interpolationMethod === 'weightedlinear') {
-        // build the interpolate planes between original planes
-        for (let i = 0; i < intervals.length-1; i++) {
-          const step = intervals[i+1]-intervals[i]
-          for (let j = intervals[i]+1; j < intervals[i+1]; j++) {
-            let p = new Int16Array(length)
-            const w = (j-intervals[i]) / step
-            for (let k = 0; k < length-1; k++) {
-              // simple linear interpolation
-              // const p0 = this.volume[intervals[i]][k]
-              // const p1 = this.volume[intervals[i+1]][k]
-              // p[k] = (p0+p1)/2   
+//       if (interpolationMethod === 'no') {
+//         // build missing planes without interpolation, simple duplicate
+//         for (let i = 0; i < intervals.length-1; i++)
+//           for (let j = intervals[i]+1; j <= intervals[i+1]-1; j++)
+//             this.volume[j] = this.volume[intervals[i+1]]
+//       } else if (interpolationMethod === 'weightedlinear') {
+//         // build the interpolate planes between original planes
+//         for (let i = 0; i < intervals.length-1; i++) {
+//           const step = intervals[i+1]-intervals[i]
+//           for (let j = intervals[i]+1; j < intervals[i+1]; j++) {
+//             let p = new Int16Array(length)
+//             const w = (j-intervals[i]) / step
+//             for (let k = 0; k < length-1; k++) {
+//               // simple linear interpolation
+//               // const p0 = this.volume[intervals[i]][k]
+//               // const p1 = this.volume[intervals[i+1]][k]
+//               // p[k] = (p0+p1)/2   
 
-              // weighted linear interpolation
-              const p0 = this.volume[intervals[i]][k] * (1-w)
-              const p1 = this.volume[intervals[i+1]][k] * w
-              p[k] = p0+p1
+//               // weighted linear interpolation
+//               const p0 = this.volume[intervals[i]][k] * (1-w)
+//               const p1 = this.volume[intervals[i+1]][k] * w
+//               p[k] = p0+p1
 
-              // weighted bilinear interpolation
-              /*if (k-1 > 0 && k+1 < length) {
-                const p0 = this.volume[intervals[i]][k] * (1-w) * 0.5 + this.volume[intervals[i]][k-1] * (1-w) * 0.25 + this.volume[intervals[i]][k+1] * (1-w) * 0.25
-                const p1 = this.volume[intervals[i+1]][k] * w * 0.5 + this.volume[intervals[i+1]][k-1] * w * 0.25 + this.volume[intervals[i+1]][k+1] * w * 0.25
-                p[k] = p0+p1
-              } else if (k-1 < 0) {
-                const p0 = this.volume[intervals[i]][k] * (1-w) * 0.75 + this.volume[intervals[i]][k+1] * (1-w) * 0.25
-                const p1 = this.volume[intervals[i+1]][k] * w * 0.5 + this.volume[intervals[i+1]][k+1] * w * 0.25
-                p[k] = p0+p1
-              } else { // k+1 > length 
-                const p0 = this.volume[intervals[i]][k] * (1-w) * 0.75 + this.volume[intervals[i]][k-1] * (1-w) * 0.25
-                const p1 = this.volume[intervals[i+1]][k] * w * 0.5 + this.volume[intervals[i+1]][k-1] * w * 0.25
-                p[k] = p0+p1
-              }*/
-            }
+//               // weighted bilinear interpolation
+//               /*if (k-1 > 0 && k+1 < length) {
+//                 const p0 = this.volume[intervals[i]][k] * (1-w) * 0.5 + this.volume[intervals[i]][k-1] * (1-w) * 0.25 + this.volume[intervals[i]][k+1] * (1-w) * 0.25
+//                 const p1 = this.volume[intervals[i+1]][k] * w * 0.5 + this.volume[intervals[i+1]][k-1] * w * 0.25 + this.volume[intervals[i+1]][k+1] * w * 0.25
+//                 p[k] = p0+p1
+//               } else if (k-1 < 0) {
+//                 const p0 = this.volume[intervals[i]][k] * (1-w) * 0.75 + this.volume[intervals[i]][k+1] * (1-w) * 0.25
+//                 const p1 = this.volume[intervals[i+1]][k] * w * 0.5 + this.volume[intervals[i+1]][k+1] * w * 0.25
+//                 p[k] = p0+p1
+//               } else { // k+1 > length 
+//                 const p0 = this.volume[intervals[i]][k] * (1-w) * 0.75 + this.volume[intervals[i]][k-1] * (1-w) * 0.25
+//                 const p1 = this.volume[intervals[i+1]][k] * w * 0.5 + this.volume[intervals[i+1]][k-1] * w * 0.25
+//                 p[k] = p0+p1
+//               }*/
+//             }
 
-            this.volume[j]= p
-          }
-        }
-      }
+//             this.volume[j]= p
+//           }
+//         }
+//       }
 
-      this.t1 = performance.now()
-      console.log(`performance volume building: ${this.t1-this.t0} milliseconds`)
+//       this.t1 = performance.now()
+//       console.log(`performance volume building: ${this.t1-this.t0} milliseconds`)
 
-    } else { // overlapping slices
-      this.mprData.zStep = Math.round(files.length / this.mprData.zDim)
-      for (let i = 0, len = this.mprData.zDim; i < len; i++) {
-        const k = i*this.mprData.zStep
-        this.volume.push(files[k].image.getPixelData())
-      }  
-    }
+//     } else { // overlapping slices
+//       this.mprData.zStep = Math.round(files.length / this.mprData.zDim)
+//       for (let i = 0, len = this.mprData.zDim; i < len; i++) {
+//         const k = i*this.mprData.zStep
+//         this.volume.push(files[k].image.getPixelData())
+//       }  
+//     }
 
-    const index = Math.round(files.length / 2)
-    this.setState({sliceIndex: index}, () => {
-      if (this.state.visibleMprOrthogonal) {
-        this.changeToOrthogonalView()
+//     const index = Math.round(files.length / 2)
+//     this.setState({sliceIndex: index}, () => {
+//       if (this.state.visibleMprOrthogonal) {
+//         this.changeToOrthogonalView()
 
-      } else if (this.state.visibleMprSagittal) {
-        this.changeToSagittalView()
+//       } else if (this.state.visibleMprSagittal) {
+//         this.changeToSagittalView()
 
-      } else if (this.state.visibleMprCoronal) {
-        this.changeToCoronalView()  
+//       } else if (this.state.visibleMprCoronal) {
+//         this.changeToCoronalView()  
 
-      } else { // axial
-        this.changeToAxialView()
-      }      
-    })
+//       } else { // axial
+//         this.changeToAxialView()
+//       }      
+//     })
           
-  }
+//   }
 
-  changeToOrthogonalView = () => {  
-    //console.log('changeToOrthogonalView - files: ', this.dicomViewersRefs[0].files)
+//   changeToOrthogonalView = () => {  
+//     //console.log('changeToOrthogonalView - files: ', this.dicomViewersRefs[0].files)
     
-    this.setState({sliceMax: this.dicomViewersRefs[0].files.length})
+//     this.setState({sliceMax: this.dicomViewersRefs[0].files.length})
 
-    this.changeLayout(1, 3)
+//     this.changeLayout(1, 3)
 
-    const index = Math.trunc(this.dicomViewersRefs[0].files.length / 2)
+//     const index = Math.trunc(this.dicomViewersRefs[0].files.length / 2)
 
-    this.setState({visibleVolumeBuilding: false, sliceIndex: index, mprMode: true}, () => {
-      const plane = this.mprPlanePosition()
+//     this.setState({visibleVolumeBuilding: false, sliceIndex: index, mprMode: true}, () => {
+//       const plane = this.mprPlanePosition()
 
-      if (this.dicomViewersRefs[0].volume === null)
-        this.dicomViewersRefs[0].volume = this.volume
+//       if (this.dicomViewersRefs[0].volume === null)
+//         this.dicomViewersRefs[0].volume = this.volume
 
-      this.dicomViewersRefs[0].runTool('openimage', index)
+//       this.dicomViewersRefs[0].runTool('openimage', index)
 
-      if (this.dicomViewersRefs[1].volume === null)
-        this.dicomViewersRefs[1].volume = this.volume
+//       if (this.dicomViewersRefs[1].volume === null)
+//         this.dicomViewersRefs[1].volume = this.volume
       
-      this.dicomViewersRefs[1].runTool('setfiles', this.files)
-      this.dicomViewersRefs[1].explorerIndex = this.dicomViewersRefs[0].explorerIndex
-      this.dicomViewersRefs[1].sliceMax = this.dicomViewersRefs[0].files[index].image.columns
-      const xzIndex = Math.trunc(this.dicomViewersRefs[1].sliceMax / 2)
-      this.dicomViewersRefs[1].mprRenderXZPlane(this.dicomViewersRefs[0].filename, plane, xzIndex, this.mprData)  
+//       this.dicomViewersRefs[1].runTool('setfiles', this.files)
+//       this.dicomViewersRefs[1].explorerIndex = this.dicomViewersRefs[0].explorerIndex
+//       this.dicomViewersRefs[1].sliceMax = this.dicomViewersRefs[0].files[index].image.columns
+//       const xzIndex = Math.trunc(this.dicomViewersRefs[1].sliceMax / 2)
+//       this.dicomViewersRefs[1].mprRenderXZPlane(this.dicomViewersRefs[0].filename, plane, xzIndex, this.mprData)  
       
-      if (this.dicomViewersRefs[2].volume === null)
-        this.dicomViewersRefs[2].volume = this.volume
+//       if (this.dicomViewersRefs[2].volume === null)
+//         this.dicomViewersRefs[2].volume = this.volume
 
-      this.dicomViewersRefs[2].runTool('setfiles', this.files) 
-      this.dicomViewersRefs[2].explorerIndex = this.dicomViewersRefs[0].explorerIndex
-      this.dicomViewersRefs[2].sliceMax = this.dicomViewersRefs[0].files[index].image.columns
-      const yzIndex = Math.trunc(this.dicomViewersRefs[2].sliceMax / 2) 
-      this.dicomViewersRefs[2].mprRenderYZPlane(this.dicomViewersRefs[0].filename, plane, yzIndex, this.mprData)    
-    })
+//       this.dicomViewersRefs[2].runTool('setfiles', this.files) 
+//       this.dicomViewersRefs[2].explorerIndex = this.dicomViewersRefs[0].explorerIndex
+//       this.dicomViewersRefs[2].sliceMax = this.dicomViewersRefs[0].files[index].image.columns
+//       const yzIndex = Math.trunc(this.dicomViewersRefs[2].sliceMax / 2) 
+//       this.dicomViewersRefs[2].mprRenderYZPlane(this.dicomViewersRefs[0].filename, plane, yzIndex, this.mprData)    
+//     })
 
-  }
+//   }
 
-  changeToSagittalView = () => {
-    //console.log('changeToSagittalView: ')
+//   changeToSagittalView = () => {
+//     //console.log('changeToSagittalView: ')
 
-    this.changeLayout(1, 1)
+//     this.changeLayout(1, 1)
 
-    this.setState({visibleVolumeBuilding: false}, () => {
-      const plane = this.mprPlanePosition()
+//     this.setState({visibleVolumeBuilding: false}, () => {
+//       const plane = this.mprPlanePosition()
 
-      if (this.dicomViewersRefs[this.props.activeDcmIndex].volume === null)
-        this.dicomViewersRefs[this.props.activeDcmIndex].volume = this.volume
+//       if (this.dicomViewersRefs[this.props.activeDcmIndex].volume === null)
+//         this.dicomViewersRefs[this.props.activeDcmIndex].volume = this.volume
 
-      if (plane === 'sagittal') { 
-        this.dicomViewersRefs[0].runTool('setfiles', this.files) // due to EchoNumber can be changed
-        const sliceMax = this.dicomViewersRefs[0].files === null ? 1 : this.dicomViewersRefs[0].files.length
-        const index = Math.trunc(sliceMax / 2)
-        this.setState({sliceIndex: index, sliceMax: sliceMax, mprMode: false}, () => {
-          this.dicomViewersRefs[this.props.activeDcmIndex].sliceMax = sliceMax
-          this.dicomViewersRefs[this.props.activeDcmIndex].runTool('openimage', index)
-        })
-      } else if (plane === 'axial') {
-        const sliceMax = this.dicomViewersRefs[0].files[0].image.rows // this.mprData.zDim 
-        const index = Math.trunc(sliceMax / 2)
-        this.setState({sliceIndex: index, sliceMax: sliceMax}, () => {
-          this.dicomViewersRefs[this.props.activeDcmIndex].sliceMax = sliceMax
-          this.dicomViewersRefs[this.props.activeDcmIndex].mprRenderYZPlane(this.dicomViewersRefs[0].filename, plane, index, this.mprData)
-        })   
-      } else {
-        const sliceMax = this.dicomViewersRefs[0].files[0].image.columns // this.mprData.zDim 
-        const index = Math.trunc(sliceMax / 2)
-        this.setState({sliceIndex: index, sliceMax: sliceMax}, () => {
-          this.dicomViewersRefs[this.props.activeDcmIndex].sliceMax = sliceMax
-          this.dicomViewersRefs[this.props.activeDcmIndex].mprRenderXZPlane(this.dicomViewersRefs[0].filename, plane, index, this.mprData)
-        }) 
-      }      
-    })
-  }
+//       if (plane === 'sagittal') { 
+//         this.dicomViewersRefs[0].runTool('setfiles', this.files) // due to EchoNumber can be changed
+//         const sliceMax = this.dicomViewersRefs[0].files === null ? 1 : this.dicomViewersRefs[0].files.length
+//         const index = Math.trunc(sliceMax / 2)
+//         this.setState({sliceIndex: index, sliceMax: sliceMax, mprMode: false}, () => {
+//           this.dicomViewersRefs[this.props.activeDcmIndex].sliceMax = sliceMax
+//           this.dicomViewersRefs[this.props.activeDcmIndex].runTool('openimage', index)
+//         })
+//       } else if (plane === 'axial') {
+//         const sliceMax = this.dicomViewersRefs[0].files[0].image.rows // this.mprData.zDim 
+//         const index = Math.trunc(sliceMax / 2)
+//         this.setState({sliceIndex: index, sliceMax: sliceMax}, () => {
+//           this.dicomViewersRefs[this.props.activeDcmIndex].sliceMax = sliceMax
+//           this.dicomViewersRefs[this.props.activeDcmIndex].mprRenderYZPlane(this.dicomViewersRefs[0].filename, plane, index, this.mprData)
+//         })   
+//       } else {
+//         const sliceMax = this.dicomViewersRefs[0].files[0].image.columns // this.mprData.zDim 
+//         const index = Math.trunc(sliceMax / 2)
+//         this.setState({sliceIndex: index, sliceMax: sliceMax}, () => {
+//           this.dicomViewersRefs[this.props.activeDcmIndex].sliceMax = sliceMax
+//           this.dicomViewersRefs[this.props.activeDcmIndex].mprRenderXZPlane(this.dicomViewersRefs[0].filename, plane, index, this.mprData)
+//         }) 
+//       }      
+//     })
+//   }
 
-  changeToCoronalView = () => {  
-    this.changeLayout(1, 1)
+//   changeToCoronalView = () => {  
+//     this.changeLayout(1, 1)
 
-    this.setState({visibleVolumeBuilding: false}, () => {
-      const plane = this.mprPlanePosition()
+//     this.setState({visibleVolumeBuilding: false}, () => {
+//       const plane = this.mprPlanePosition()
 
-      if (this.dicomViewersRefs[this.props.activeDcmIndex].volume === null)
-        this.dicomViewersRefs[this.props.activeDcmIndex].volume = this.volume
+//       if (this.dicomViewersRefs[this.props.activeDcmIndex].volume === null)
+//         this.dicomViewersRefs[this.props.activeDcmIndex].volume = this.volume
 
-      if (plane === 'coronal') {
-        this.dicomViewersRefs[0].runTool('setfiles', this.files) // due to EchoNumber can be changed
-        const sliceMax = this.dicomViewersRefs[0].files === null ? 1 : this.dicomViewersRefs[0].files.length
-        const index = Math.trunc(sliceMax / 2)
-        this.setState({sliceIndex: index, sliceMax: sliceMax, mprMode: false}, () => {
-          this.dicomViewersRefs[this.props.activeDcmIndex].sliceMax = sliceMax
-          this.dicomViewersRefs[this.props.activeDcmIndex].runTool('openimage', index)
-        })       
+//       if (plane === 'coronal') {
+//         this.dicomViewersRefs[0].runTool('setfiles', this.files) // due to EchoNumber can be changed
+//         const sliceMax = this.dicomViewersRefs[0].files === null ? 1 : this.dicomViewersRefs[0].files.length
+//         const index = Math.trunc(sliceMax / 2)
+//         this.setState({sliceIndex: index, sliceMax: sliceMax, mprMode: false}, () => {
+//           this.dicomViewersRefs[this.props.activeDcmIndex].sliceMax = sliceMax
+//           this.dicomViewersRefs[this.props.activeDcmIndex].runTool('openimage', index)
+//         })       
 
-      } else if (plane === 'axial') {
-        const sliceMax = this.dicomViewersRefs[0].files[0].image.columns // this.mprData.zDim 
-        const index = Math.trunc(sliceMax / 2)
-        this.setState({sliceIndex: index, sliceMax: sliceMax}, () => {
-          this.dicomViewersRefs[this.props.activeDcmIndex].sliceMax = sliceMax
-          this.dicomViewersRefs[this.props.activeDcmIndex].mprRenderXZPlane(this.dicomViewersRefs[0].filename, plane, index, this.mprData)
-        })
+//       } else if (plane === 'axial') {
+//         const sliceMax = this.dicomViewersRefs[0].files[0].image.columns // this.mprData.zDim 
+//         const index = Math.trunc(sliceMax / 2)
+//         this.setState({sliceIndex: index, sliceMax: sliceMax}, () => {
+//           this.dicomViewersRefs[this.props.activeDcmIndex].sliceMax = sliceMax
+//           this.dicomViewersRefs[this.props.activeDcmIndex].mprRenderXZPlane(this.dicomViewersRefs[0].filename, plane, index, this.mprData)
+//         })
 
-      } else { // plane is sagittal
-        const sliceMax = this.dicomViewersRefs[0].files[0].image.rows // this.mprData.zDim 
-        const index = Math.trunc(sliceMax / 2)
-        this.setState({sliceIndex: index, sliceMax: sliceMax}, () => {
-          this.dicomViewersRefs[this.props.activeDcmIndex].sliceMax = sliceMax
-          this.dicomViewersRefs[this.props.activeDcmIndex].mprRenderYZPlane(this.dicomViewersRefs[0].filename, plane, index, this.mprData)
-        })  
-      }      
-    })
-  }
+//       } else { // plane is sagittal
+//         const sliceMax = this.dicomViewersRefs[0].files[0].image.rows // this.mprData.zDim 
+//         const index = Math.trunc(sliceMax / 2)
+//         this.setState({sliceIndex: index, sliceMax: sliceMax}, () => {
+//           this.dicomViewersRefs[this.props.activeDcmIndex].sliceMax = sliceMax
+//           this.dicomViewersRefs[this.props.activeDcmIndex].mprRenderYZPlane(this.dicomViewersRefs[0].filename, plane, index, this.mprData)
+//         })  
+//       }      
+//     })
+//   }
 
-  changeToAxialView = () => {  
-    this.changeLayout(1, 1)
+//   changeToAxialView = () => {  
+//     this.changeLayout(1, 1)
 
-    this.setState({visibleVolumeBuilding: false}, () => {
-      const plane = this.mprPlanePosition()
+//     this.setState({visibleVolumeBuilding: false}, () => {
+//       const plane = this.mprPlanePosition()
           
-      if (this.dicomViewersRefs[this.props.activeDcmIndex].volume === null)
-        this.dicomViewersRefs[this.props.activeDcmIndex].volume = this.volume
+//       if (this.dicomViewersRefs[this.props.activeDcmIndex].volume === null)
+//         this.dicomViewersRefs[this.props.activeDcmIndex].volume = this.volume
 
-      if (plane === 'axial') {
-        this.dicomViewersRefs[0].runTool('setfiles', this.files) // due to EchoNumber can be changed
-        const sliceMax = this.dicomViewersRefs[0].files === null ? 1 : this.dicomViewersRefs[0].files.length
-        const index = Math.trunc(sliceMax / 2)
-        this.setState({sliceIndex: index, sliceMax: sliceMax, mprMode: false}, () => {
-          this.dicomViewersRefs[this.props.activeDcmIndex].sliceMax = sliceMax
-          this.dicomViewersRefs[this.props.activeDcmIndex].runTool('openimage', index)
-        })
+//       if (plane === 'axial') {
+//         this.dicomViewersRefs[0].runTool('setfiles', this.files) // due to EchoNumber can be changed
+//         const sliceMax = this.dicomViewersRefs[0].files === null ? 1 : this.dicomViewersRefs[0].files.length
+//         const index = Math.trunc(sliceMax / 2)
+//         this.setState({sliceIndex: index, sliceMax: sliceMax, mprMode: false}, () => {
+//           this.dicomViewersRefs[this.props.activeDcmIndex].sliceMax = sliceMax
+//           this.dicomViewersRefs[this.props.activeDcmIndex].runTool('openimage', index)
+//         })
         
 
-      } else if (plane === 'sagittal') {
-        const sliceMax = this.dicomViewersRefs[0].files[0].image.columns // this.mprData.zDim 
-        const index = Math.trunc(sliceMax / 2)
-        this.setState({sliceIndex: index, sliceMax: sliceMax}, () => {
-          this.dicomViewersRefs[this.props.activeDcmIndex].sliceMax = sliceMax
-          this.dicomViewersRefs[this.props.activeDcmIndex].mprRenderXZPlane(this.dicomViewersRefs[0].filename, plane, index, this.mprData)
-        })
+//       } else if (plane === 'sagittal') {
+//         const sliceMax = this.dicomViewersRefs[0].files[0].image.columns // this.mprData.zDim 
+//         const index = Math.trunc(sliceMax / 2)
+//         this.setState({sliceIndex: index, sliceMax: sliceMax}, () => {
+//           this.dicomViewersRefs[this.props.activeDcmIndex].sliceMax = sliceMax
+//           this.dicomViewersRefs[this.props.activeDcmIndex].mprRenderXZPlane(this.dicomViewersRefs[0].filename, plane, index, this.mprData)
+//         })
         
 
-      } else {
-        const sliceMax = this.dicomViewersRefs[0].files[0].image.rows // this.mprData.zDim 
-        const index = Math.trunc(sliceMax / 2)
-        this.setState({sliceIndex: index, sliceMax: sliceMax}, () => {
-          this.dicomViewersRefs[this.props.activeDcmIndex].sliceMax = sliceMax
-          this.dicomViewersRefs[this.props.activeDcmIndex].mprRenderYZPlane(this.dicomViewersRefs[0].filename, plane, index, this.mprData)
-        })             
-      }      
-    })
-  }
+//       } else {
+//         const sliceMax = this.dicomViewersRefs[0].files[0].image.rows // this.mprData.zDim 
+//         const index = Math.trunc(sliceMax / 2)
+//         this.setState({sliceIndex: index, sliceMax: sliceMax}, () => {
+//           this.dicomViewersRefs[this.props.activeDcmIndex].sliceMax = sliceMax
+//           this.dicomViewersRefs[this.props.activeDcmIndex].mprRenderYZPlane(this.dicomViewersRefs[0].filename, plane, index, this.mprData)
+//         })             
+//       }      
+//     })
+//   }
 
-  mprPlanePosition = (force = false, index = this.props.activeDcmIndex) => {
-    //console.log('App - mprPlanePosition: ', index)
-    if (this.mprPlane === '' || force) {
-      this.mprPlane = this.dicomViewersRefs[index].mprPlanePosition()
-      if (!this.state.visibleMprOrthogonal) {
-        if (this.mprPlane === 'sagittal')
-          this.setState({ visibleMprOrthogonal: false, visibleMprSagittal: true, visibleMprAxial: false, visibleMprCoronal: false})
-        else if (this.mprPlane === 'coronal')
-          this.setState({ visibleMprOrthogonal: false, visibleMprSagittal: false, visibleMprAxial: false, visibleMprCoronal: true })  
-        else 
-          this.setState({ visibleMprOrthogonal: false, visibleMprSagittal: false, visibleMprAxial: true, visibleMprCoronal: false })        
-      }
-    }
-    return this.mprPlane  
-  }
+//   mprPlanePosition = (force = false, index = this.props.activeDcmIndex) => {
+//     //console.log('App - mprPlanePosition: ', index)
+//     // if (this.mprPlane === '' || force) {
+//     //   this.mprPlane = this.dicomViewersRefs[index].mprPlanePosition()
+//     //   if (!this.state.visibleMprOrthogonal) {
+//     //     if (this.mprPlane === 'sagittal')
+//     //       this.setState({ visibleMprOrthogonal: false, visibleMprSagittal: true, visibleMprAxial: false, visibleMprCoronal: false})
+//     //     else if (this.mprPlane === 'coronal')
+//     //       this.setState({ visibleMprOrthogonal: false, visibleMprSagittal: false, visibleMprAxial: false, visibleMprCoronal: true })  
+//     //     else 
+//     //       this.setState({ visibleMprOrthogonal: false, visibleMprSagittal: false, visibleMprAxial: true, visibleMprCoronal: false })        
+//     //   }
+//     // }
+//     return this.mprPlane  
+//   }
 
-  mpr3D = () => {
+//   mpr3D = () => {
     
-  }
+//   }
 
-  mprOrthogonal = () => {
-    const visibleMprOrthogonal = this.state.visibleMprOrthogonal
-    if (!visibleMprOrthogonal) {
-      this.mprData.plane = {
-        from: this.mprPlane,
-        to: 'orthogonal'
-      }
-      this.setState({visibleMprOrthogonal: true, 
-                    visibleMprCoronal: false, 
-                    visibleMprSagittal: false, 
-                    visibleMprAxial: false}, () => {
-        if (this.volume.length === 0) {   
-          this.setState({visibleVolumeBuilding: true}, () => {           
-            setTimeout(() => {
-              this.mprBuildVolume()
-            }, 100)   
-          })
-        } else {
-          this.changeToOrthogonalView()
-        }
-      })
-    }
-  }
+  // mprOrthogonal = () => {
+  //   const visibleMprOrthogonal = this.state.visibleMprOrthogonal
+  //   if (!visibleMprOrthogonal) {
+  //     this.mprData.plane = {
+  //       from: this.mprPlane,
+  //       to: 'orthogonal'
+  //     }
+  //     this.setState({visibleMprOrthogonal: true, 
+  //                   visibleMprCoronal: false, 
+  //                   visibleMprSagittal: false, 
+  //                   visibleMprAxial: false}, () => {
+  //       if (this.volume.length === 0) {   
+  //         this.setState({visibleVolumeBuilding: true}, () => {           
+  //           setTimeout(() => {
+  //             this.mprBuildVolume()
+  //           }, 100)   
+  //         })
+  //       } else {
+  //         this.changeToOrthogonalView()
+  //       }
+  //     })
+  //   }
+  // }
 
-  mprSagittal = () => {
-    const visibleMprSagittal = this.state.visibleMprSagittal
-    if (!visibleMprSagittal) {
-      this.mprData.plane = {
-        from: this.mprPlane,
-        to: 'sagittal'
-      }
-      this.setState({visibleMprOrthogonal: false, 
-                    visibleMprSagittal: true, 
-                    visibleMprCoronal: false, 
-                    visibleMprAxial: false}, () => {
-        if (this.volume.length === 0) {   
-          this.setState({visibleVolumeBuilding: true}, () => {           
-            setTimeout(() => {
-              this.mprBuildVolume()
-            }, 100)   
-          })
-        } else {
-          this.changeToSagittalView()
-        }
-      })
-    }
-  }
+  // mprSagittal = () => {
+  //   const visibleMprSagittal = this.state.visibleMprSagittal
+  //   if (!visibleMprSagittal) {
+  //     this.mprData.plane = {
+  //       from: this.mprPlane,
+  //       to: 'sagittal'
+  //     }
+  //     this.setState({visibleMprOrthogonal: false, 
+  //                   visibleMprSagittal: true, 
+  //                   visibleMprCoronal: false, 
+  //                   visibleMprAxial: false}, () => {
+  //       if (this.volume.length === 0) {   
+  //         this.setState({visibleVolumeBuilding: true}, () => {           
+  //           setTimeout(() => {
+  //             this.mprBuildVolume()
+  //           }, 100)   
+  //         })
+  //       } else {
+  //         this.changeToSagittalView()
+  //       }
+  //     })
+  //   }
+  // }
     
-  mprCoronal = () => {
-    const visibleMprCoronal = this.state.visibleMprCoronal
-    if (!visibleMprCoronal) {
-      this.mprData.plane = {
-        from: this.mprPlane,
-        to: 'coronal'
-      }
-      this.setState({visibleMprOrthogonal: false, 
-                     visibleMprSagittal: false, 
-                     visibleMprCoronal: true, 
-                     visibleMprAxial: false}, () => {
-        if (this.volume.length === 0) {   
-          this.setState({visibleVolumeBuilding: true}, () => {           
-            setTimeout(() => {
-              this.mprBuildVolume()
-            }, 100)   
-          })
-        } else {
-          this.changeToCoronalView()
-        }
-      })
-    }
-  }
+  // mprCoronal = () => {
+  //   const visibleMprCoronal = this.state.visibleMprCoronal
+  //   if (!visibleMprCoronal) {
+  //     this.mprData.plane = {
+  //       from: this.mprPlane,
+  //       to: 'coronal'
+  //     }
+  //     this.setState({visibleMprOrthogonal: false, 
+  //                    visibleMprSagittal: false, 
+  //                    visibleMprCoronal: true, 
+  //                    visibleMprAxial: false}, () => {
+  //       if (this.volume.length === 0) {   
+  //         this.setState({visibleVolumeBuilding: true}, () => {           
+  //           setTimeout(() => {
+  //             this.mprBuildVolume()
+  //           }, 100)   
+  //         })
+  //       } else {
+  //         this.changeToCoronalView()
+  //       }
+  //     })
+  //   }
+  // }
 
-  mprAxial = () => {
-    const visibleMprAxial = this.state.visibleMprAxial
-    if (!visibleMprAxial) {
-      this.mprData.plane = {
-        from: this.mprPlane,
-        to: 'axial'
-      }
-      this.setState({visibleMprOrthogonal: false, 
-                     visibleMprSagittal: false, 
-                     visibleMprCoronal: false, 
-                     visibleMprAxial: true}, () => {
-        if (this.volume.length === 0) {   
-          this.setState({visibleVolumeBuilding: true}, () => {           
-            setTimeout(() => {
-              this.mprBuildVolume()
-            }, 100)   
-          })
-        } else {
-          this.changeToAxialView()
-        }
-      })
-    }
-  }
+  // mprAxial = () => {
+  //   const visibleMprAxial = this.state.visibleMprAxial
+  //   if (!visibleMprAxial) {
+  //     this.mprData.plane = {
+  //       from: this.mprPlane,
+  //       to: 'axial'
+  //     }
+  //     this.setState({visibleMprOrthogonal: false, 
+  //                    visibleMprSagittal: false, 
+  //                    visibleMprCoronal: false, 
+  //                    visibleMprAxial: true}, () => {
+  //       if (this.volume.length === 0) {   
+  //         this.setState({visibleVolumeBuilding: true}, () => {           
+  //           setTimeout(() => {
+  //             this.mprBuildVolume()
+  //           }, 100)   
+  //         })
+  //       } else {
+  //         this.changeToAxialView()
+  //       }
+  //     })
+  //   }
+  // }
 
   // #endregion 
   
@@ -1783,7 +1783,7 @@ class App extends PureComponent {
     
     //const isMultipleView = this.props.layout[0] > 1 || this.props.layout[1] > 1
     const isOpen = this.props.isOpen[this.props.activeDcmIndex]
-    const isDicomdir = this.props.dicomdir !== null
+    // const isDicomdir = this.props.dicomdir !== null
     this.isMultipleFiles = false
     if (this.dicomViewersRefs[this.props.activeDcmIndex] === undefined) {
       this.isMultipleFiles = false
@@ -1917,14 +1917,14 @@ class App extends PureComponent {
               </Tooltip>
               ) : null
             }  
-            { isDicomdir ? (
+            {/* { isDicomdir ? (
               <Tooltip title="DICOMDIR">
                 <IconButton color="inherit" onClick={this.toggleDicomdir}>
                   <Icon path={mdiFolderOpen} size={iconSize} color={iconToolColor} />
                 </IconButton>
               </Tooltip>
               ) : null
-            }    
+            }     */}
             { (isOpen && this.isMultipleFiles) || visibleMprOrthogonal ? (
               <Tooltip title="Explorer">
                 <IconButton color="inherit" onClick={this.toggleExplorer}>
@@ -2012,20 +2012,20 @@ class App extends PureComponent {
                 <ListItemIcon><Icon path={mdiViewGridPlusOutline} size={iconSize} color={iconColor} /></ListItemIcon>
                 <ListItemText classes={primaryClass} primary='Layout' />              
               </ListItem>   
-              <ListItem button onClick={() => this.showSettings()}>
+              {/* <ListItem button onClick={() => this.showSettings()}>
                 <ListItemIcon><Icon path={mdiCog} size={iconSize} color={iconColor} /></ListItemIcon>
                 <ListItemText classes={primaryClass} primary='Settings' />
-              </ListItem>                
+              </ListItem>                 */}
               <Divider />
-              <ListItem button onClick={() => this.toggleToolbox()} disabled={!isOpen}>
+              {/* <ListItem button onClick={() => this.toggleToolbox()} disabled={!isOpen}>
                 <ListItemIcon><Icon path={mdiChartHistogram} size={iconSize} color={iconColor} /></ListItemIcon>
                 <ListItemText classes={primaryClass} primary='Histogram' />
-              </ListItem>  
-              <ListItem button onClick={() => this.toggleMpr()} disabled={!isOpen || this.mprPlane === ''}>
+              </ListItem>   */}
+              {/* <ListItem button onClick={() => this.toggleMpr()} disabled={!isOpen || this.mprPlane === ''}>
                 <ListItemIcon><Icon path={mdiAxisArrow} size={iconSize} color={iconColor} /></ListItemIcon>
                 <ListItemText classes={primaryClass} primary='MPR' />
                 {mprMenu ? <ExpandLess /> : <ExpandMore />}
-              </ListItem>            
+              </ListItem>             */}
 
               <Collapse in={mprMenu} timeout="auto" unmountOnExit>
                 <List dense={true} component="div">
