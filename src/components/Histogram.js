@@ -73,7 +73,7 @@ class Histogram extends PureComponent {
       ctxH.translate(0, canvasH.height)
       ctxH.scale(1, -1)
 
-      this.updateCanvas()     
+     //this.updateCanvas()     
     }
     
     componentDidUpdate() {
@@ -157,177 +157,178 @@ class Histogram extends PureComponent {
       return sp[0]
     }
 
-    updateCanvas() {
-      if (this.props.activeDcm === null) return
-      const image = this.props.activeDcm.image
-      if (image === null) return
-      //const element = this.props.element
-      const maxPixelValue = image.maxPixelValue
-      const minPixelValue = image.minPixelValue
-      //const k = Math.pow(2, this.props.bitsStored)
-      const minHist = minPixelValue+image.intercept
-      const maxHist = maxPixelValue+image.intercept
-      const lenHist = maxHist-minHist+1
-      const binSize = lenHist / N_BINS
-      let zero256 = Math.floor(Math.abs(minHist) / binSize)
-      let stepWW = Math.round(image.windowWidth / binSize / 2)
-      let stepWC = Math.round(image.windowCenter / binSize)
+    // updateCanvas() {
+    //   if (this.props.activeDcm === null) return
+    //   const image = this.props.activeDcm.image
+    //   if (image === null) return
+    //   //const element = this.props.element
+    //   const maxPixelValue = image.maxPixelValue
+    //   const minPixelValue = image.minPixelValue
+    //   //const k = Math.pow(2, this.props.bitsStored)
+    //   const minHist = minPixelValue+image.intercept
+    //   const maxHist = maxPixelValue+image.intercept
+    //   const lenHist = maxHist-minHist+1
+    //   const binSize = lenHist / N_BINS
+    //   let zero256 = Math.floor(Math.abs(minHist) / binSize)
+    //   let stepWW = Math.round(image.windowWidth / binSize / 2)
+    //   let stepWC = Math.round(image.windowCenter / binSize)
 
-      this.setState({minHist: minHist})
-      this.setState({maxHist: maxHist})
-      this.binSize = binSize
+    //   this.setState({minHist: minHist})
+    //   this.setState({maxHist: maxHist})
+    //   this.binSize = binSize
 
-      //console.log('activeDcm: ', this.props.activeDcm)
-      //console.log('image: ', )
-      //console.log('getPixelData: ', image.getPixelData())
-      //console.log('columns: ', image.columns)
-      //console.log('rows: ', image.rows)
-      //console.log('isDicom: ', this.props.activeDcm.isDicom)
-      //console.log('bitsStored: ', k)
-      //console.log('minHist: ', minHist)
-      //console.log('maxHist: ', maxHist)
-      //console.log('lenHist: ', lenHist)
-      //console.log('binSize: ', binSize)
-      //console.log('zeroHist: ', zero256)
-      //console.log('stepWW: ', stepWW)
-      //console.log('stepWC: ', stepWC)
-      //console.log('zero256-stepWW: ', zero256-stepWW)
-      //console.log('zero256+stepWW: ', zero256+stepWW)   
-      //console.log('image.color: ', image.color)
-      //console.log('image.slope: ', image.slope)
-      //console.log('image.intercept: ', image.intercept)
+    //   //console.log('activeDcm: ', this.props.activeDcm)
+    //   //console.log('image: ', )
+    //   //console.log('getPixelData: ', image.getPixelData())
+    //   //console.log('columns: ', image.columns)
+    //   //console.log('rows: ', image.rows)
+    //   //console.log('isDicom: ', this.props.activeDcm.isDicom)
+    //   //console.log('bitsStored: ', k)
+    //   //console.log('minHist: ', minHist)
+    //   //console.log('maxHist: ', maxHist)
+    //   //console.log('lenHist: ', lenHist)
+    //   //console.log('binSize: ', binSize)
+    //   //console.log('zeroHist: ', zero256)
+    //   //console.log('stepWW: ', stepWW)
+    //   //console.log('stepWC: ', stepWC)
+    //   //console.log('zero256-stepWW: ', zero256-stepWW)
+    //   //console.log('zero256+stepWW: ', zero256+stepWW)   
+    //   //console.log('image.color: ', image.color)
+    //   console.log('image.slope: ', image.slope)
+    //   console.log('image.intercept: ', image.intercept)
 
-      let m = 0 // the mean
-      // build histogram
-      let hist = Array(lenHist).fill(0) 
-      for (let y = 0; y < image.columns; y++) {
-        for (let x = 0; x < image.rows; x++) {
-          let sp = this.getPixel(x, y)
-          let mo = sp * image.slope + image.intercept
-          hist[mo-minHist] += 1
-          m += mo
-        } 
-      }  
+    //   let m = 0 // the mean
+    //   // build histogram
+    //   let hist = Array(lenHist).fill(0) 
+    //   for (let y = 0; y < image.columns; y++) {
+    //     for (let x = 0; x < image.rows; x++) {
+    //       let sp = this.getPixel(x, y)
+    //       let mo = sp * image.slope + image.intercept
+    //       console.log("Hello")
+    //       hist[mo-minHist] += 1
+    //       m += mo
+    //     } 
+    //   }  
 
-      m = m / (image.columns * image.rows)
-      this.setState({mean: m})  
+    //   m = m / (image.columns * image.rows)
+    //   this.setState({mean: m})  
 
-      //console.log('hist: ', hist)
-      //console.log('mean: ', m)
+    //   //console.log('hist: ', hist)
+    //   //console.log('mean: ', m)
 
-      // calculate standard deviation
-      let s = 0
-      for (let y = 0; y < image.columns; y++)
-        for (let x = 0; x < image.rows; x++) {
-          let sp = this.getPixel(x, y)
-          let mo = sp * image.slope + image.intercept
-          s += Math.pow(mo-m, 2)
-        }  
-      s = Math.sqrt(s / (image.columns * image.rows))
-      this.setState({stdDev: s})
+    //   // calculate standard deviation
+    //   let s = 0
+    //   for (let y = 0; y < image.columns; y++)
+    //     for (let x = 0; x < image.rows; x++) {
+    //       let sp = this.getPixel(x, y)
+    //       let mo = sp * image.slope + image.intercept
+    //       s += Math.pow(mo-m, 2)
+    //     }  
+    //   s = Math.sqrt(s / (image.columns * image.rows))
+    //   this.setState({stdDev: s})
 
-      // binning the histogram 
-      let hist256 = Array(N_BINS).fill(0) 
-      let max = 0
+    //   // binning the histogram 
+    //   let hist256 = Array(N_BINS).fill(0) 
+    //   let max = 0
 
-      if (binSize < 1) {
-        let binStep = Math.round(N_BINS / lenHist)
-        let iHist = 0
-        let i = 0
-        while (i < N_BINS) {
-          for (let j=0; j < binStep; j++) { 
-            hist256[i] = iHist < lenHist ? hist[iHist] : 0
-            if (max < hist256[i]) max = hist256[i]  
-            i++
-          }   
-          iHist++     
-        }
+    //   if (binSize < 1) {
+    //     let binStep = Math.round(N_BINS / lenHist)
+    //     let iHist = 0
+    //     let i = 0
+    //     while (i < N_BINS) {
+    //       for (let j=0; j < binStep; j++) { 
+    //         hist256[i] = iHist < lenHist ? hist[iHist] : 0
+    //         if (max < hist256[i]) max = hist256[i]  
+    //         i++
+    //       }   
+    //       iHist++     
+    //     }
 
-        /*for (let i=0; i < N_BINS; i+=binStep) {
-          const k = Math.floor(i)
-          //console.log(`i: ${k} `)
-          for (let j=0; j < Math.round(binStep); j++) { 
-            console.log(`i: ${k} - j: ${j} - iHist: ${iHist} - hist[iHist]: ${hist[iHist]}`)
-            hist256[k+j] = hist[iHist]
-          }
-          iHist++
-          if (max < hist256[k]) max = hist256[k] 
-        }*/
-      } else {
-        let step = 0
-        for (let i=0; i < N_BINS; i++) {
-          for (let j=step; j < Math.round(step+binSize); j++) {
-            if (j >= lenHist) break
-            hist256[i] += hist[j]
-          }
-          if (max < hist256[i]) { max = hist256[i] }
-          step = Math.round(step+binSize)
-        }        
-      }
+    //     /*for (let i=0; i < N_BINS; i+=binStep) {
+    //       const k = Math.floor(i)
+    //       //console.log(`i: ${k} `)
+    //       for (let j=0; j < Math.round(binStep); j++) { 
+    //         console.log(`i: ${k} - j: ${j} - iHist: ${iHist} - hist[iHist]: ${hist[iHist]}`)
+    //         hist256[k+j] = hist[iHist]
+    //       }
+    //       iHist++
+    //       if (max < hist256[k]) max = hist256[k] 
+    //     }*/
+    //   } else {
+    //     let step = 0
+    //     for (let i=0; i < N_BINS; i++) {
+    //       for (let j=step; j < Math.round(step+binSize); j++) {
+    //         if (j >= lenHist) break
+    //         hist256[i] += hist[j]
+    //       }
+    //       if (max < hist256[i]) { max = hist256[i] }
+    //       step = Math.round(step+binSize)
+    //     }        
+    //   }
 
-      this.hist256 = hist256
+    //   this.hist256 = hist256
 
-      //console.log('hist256: ', hist256)
-      //console.log('max: ', max)
+    //   //console.log('hist256: ', hist256)
+    //   //console.log('max: ', max)
 
-      if (max / HIST_HEIGHT > 100) max = max / 5
+    //   if (max / HIST_HEIGHT > 100) max = max / 5
       
-      const canvasH = this.canvasHistogram.current
-      const ctxH = this.canvasHistogram.current.getContext("2d")
-      ctxH.clearRect(0, 0, ctxH.canvas.width, ctxH.canvas.height)
+    //   const canvasH = this.canvasHistogram.current
+    //   const ctxH = this.canvasHistogram.current.getContext("2d")
+    //   ctxH.clearRect(0, 0, ctxH.canvas.width, ctxH.canvas.height)
 
-      canvasH.addEventListener('pointermove', (evt) => {
-        const mousePos = this.getMousePos(canvasH, evt)
-        this.setState({histCount: hist256[mousePos.x]})
-        let p = Math.round(mousePos.x * this.binSize)
-        this.setState({valueScale: p+minHist})
-      }, true)
+    //   canvasH.addEventListener('pointermove', (evt) => {
+    //     const mousePos = this.getMousePos(canvasH, evt)
+    //     this.setState({histCount: hist256[mousePos.x]})
+    //     let p = Math.round(mousePos.x * this.binSize)
+    //     this.setState({valueScale: p+minHist})
+    //   }, true)
 
-      //console.log('value: ', (m-minHist)/binSize)
-      let value = Math.round((m-minHist)/binSize)
-      this.setState({value: value, valueScale: m, histCount: hist256[value]})
-      //this.setState({valueScale: m})
-      //this.setState({histCount: hist256[value]})
+    //   //console.log('value: ', (m-minHist)/binSize)
+    //   let value = Math.round((m-minHist)/binSize)
+    //   this.setState({value: value, valueScale: m, histCount: hist256[value]})
+    //   //this.setState({valueScale: m})
+    //   //this.setState({histCount: hist256[value]})
 
-      // draw WindowWidth area
-      ctxH.beginPath()
-      ctxH.fillStyle = 'rgba(210, 210, 210, 0.5)'
-      ctxH.fillRect(zero256-stepWW+stepWC, 0, stepWW*2, HIST_HEIGHT)
+    //   // draw WindowWidth area
+    //   ctxH.beginPath()
+    //   ctxH.fillStyle = 'rgba(210, 210, 210, 0.5)'
+    //   ctxH.fillRect(zero256-stepWW+stepWC, 0, stepWW*2, HIST_HEIGHT)
 
-      // draw histogram
-      ctxH.beginPath()
-      ctxH.strokeStyle = 'rgba(0, 0, 0, 1.0)'
-      for (let i = 0; i < N_BINS; i++) {
-        let h = Math.round((hist256[i]/max)*HIST_HEIGHT)
-        ctxH.moveTo(i, 0)
-        ctxH.lineTo(i, h)
-        ctxH.stroke()
-      }
+    //   // draw histogram
+    //   ctxH.beginPath()
+    //   ctxH.strokeStyle = 'rgba(0, 0, 0, 1.0)'
+    //   for (let i = 0; i < N_BINS; i++) {
+    //     let h = Math.round((hist256[i]/max)*HIST_HEIGHT)
+    //     ctxH.moveTo(i, 0)
+    //     ctxH.lineTo(i, h)
+    //     ctxH.stroke()
+    //   }
       
-      // draw WindowCenter cursor
-      ctxH.beginPath()
-      ctxH.strokeStyle = 'rgba(140, 140, 140, 0.5)'
-      ctxH.moveTo(zero256+stepWC, 0)
-      ctxH.lineTo(zero256+stepWC, HIST_HEIGHT)
-      ctxH.lineWidth = 1
-      ctxH.stroke()
+    //   // draw WindowCenter cursor
+    //   ctxH.beginPath()
+    //   ctxH.strokeStyle = 'rgba(140, 140, 140, 0.5)'
+    //   ctxH.moveTo(zero256+stepWC, 0)
+    //   ctxH.lineTo(zero256+stepWC, HIST_HEIGHT)
+    //   ctxH.lineWidth = 1
+    //   ctxH.stroke()
           
-      let lowX = zero256-stepWW+stepWC
-      let highX = zero256+stepWW+stepWC
+    //   let lowX = zero256-stepWW+stepWC
+    //   let highX = zero256+stepWW+stepWC
 
-      // draw gradient scale
-      const canvasG = this.canvasGradient.current
-      const ctxG = canvasG.getContext("2d")
+    //   // draw gradient scale
+    //   const canvasG = this.canvasGradient.current
+    //   const ctxG = canvasG.getContext("2d")
 
-      ctxG.fillStyle = "#000000"
-      ctxG.fillRect(0, 0, lowX, 10)
+    //   ctxG.fillStyle = "#000000"
+    //   ctxG.fillRect(0, 0, lowX, 10)
 
-      let grd = ctxG.createLinearGradient(lowX, 0, highX+(lowX < 0 ? lowX : 0), 0)
-      grd.addColorStop(0, "black")
-      grd.addColorStop(1, "white")
-      ctxG.fillStyle = grd
-      ctxG.fillRect(lowX, 0, highX, 10)
-    }
+    //   let grd = ctxG.createLinearGradient(lowX, 0, highX+(lowX < 0 ? lowX : 0), 0)
+    //   grd.addColorStop(0, "black")
+    //   grd.addColorStop(1, "white")
+    //   ctxG.fillStyle = grd
+    //   ctxG.fillRect(lowX, 0, highX, 10)
+    // }
         
     handleChangeValue = (event, newValue) => {
       //console.log('old value: ', this.state.value)
